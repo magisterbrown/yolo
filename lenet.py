@@ -43,6 +43,11 @@ class LeNet(nn.Module):
                 nn.Conv2d(1024,1024,3,padding=1,padding_mode='reflect'),
                     nn.ReLU()
                 )
+        self.linear = nn.Sequential(
+                nn.Linear(50176,4096),
+                nn.ReLU(),
+                nn.Linear(4096,1470)
+                )
 
 
     def forward(self, x):
