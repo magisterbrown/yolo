@@ -1,5 +1,7 @@
 import math
 import itertools
+import cv2
+import numpy as np
 import torch
 import xml.etree.ElementTree as ET
 
@@ -25,8 +27,8 @@ class Rectangle:
         return x/self.oh
 
     def edges(self,new: (int,int)) -> ((int,int),(int,int)):
-        procx = lambda x: int(x*new[0])
-        procy = lambda x: int(x*new[1])
+        procx = lambda x: int(x*new[1])
+        procy = lambda x: int(x*new[0])
     
         top = (procx(self.xmin),procy(self.ymin))
         bottom = (procx(self.xmax),procy(self.ymax))
@@ -39,10 +41,10 @@ class Rectangle:
 
         return (cx,cy)
 
-    def marigns(self) -> (float,float):
+    def margins(self) -> (float,float):
         cell = self.center()
-        margx = self.cenx-cell[0]*self.blocks
-        margy = self.ceny-cell[1]*self.blocks
+        margx = (self.cenx-cell[0]*self.blocks)/self.blocks
+        margy = (self.ceny-cell[1]*self.blocks)/self.blocks
 
         return (margx,margy)
     
@@ -64,27 +66,29 @@ class Lable:
         for el in root.iter('object'):
             self.rectangles.append(Rectangle(el,(self.width,self.height)))
 
-    # def get_prediction(self) -> torch.Tensor:
-    #     for rectangle in self.rectangles:
-    #         pass
-    #     return self.prediction
-
-    # def add_rectangle(self, rectangle: Rectangle):
-    #     print(rectangle.center())
-
-    def target(self,width: int,height: int) -> torch.Tensor:
+    def target(self) -> torch.Tensor:
+        cells = {}
         for rectangle in self.rectangles:
             pos = rectangle.center()
-            self.prediction[4,pos[1],pos[0]] = 1
-            cat = self.cats[rectangle.category]+5
-            self.prediction[cat,pos[1],pos[0]] = 1
+            if(pos not in cells):
+                cells[pos] = True
+                self.prediction[4,pos[1],pos[0]] = 1
+                cat = self.cats[rectangle.category]+5
+                self.prediction[cat,pos[1],pos[0]] = 1
 
-            margins = rectangle.margins()
-            size = rectangle.size()
+                margins = rectangle.margins()
+                size = rectangle.size()
 
-            self.prediction[0,pos[1],pos[0]] = margins[0]*width
-            self.prediction[1,pos[1],pos[0]] = margins[1]*height
-            self.prediction[2,pos[1],pos[0]] = size[0]*width
-            self.prediction[3,pos[1],pos[0]] = size[1]*height
+                self.prediction[0,pos[1],pos[0]] = margins[0]
+                self.prediction[1,pos[1],pos[0]] = margins[1]
+                self.prediction[2,pos[1],pos[0]] = size[0]
+                self.prediction[3,pos[1],pos[0]] = size[1]
 
         return self.prediction
+
+    def draw(self,image: np.ndarray) -> np.ndarray:
+        for rectangle in self.rectangles:
+            edges = rectangle.edges(image.shape)
+            cv2.rectangle(image, edges[0], edges[1], (255,0,0), 2)
+        return image
+
