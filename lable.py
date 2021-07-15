@@ -10,10 +10,11 @@ class Rectangle:
         self.ow = canvas[0]
         self.oh = canvas[1]
         self.category = points[0].text.strip()
-        self.xmin = self.x_prop(float(points[4][0].text))
-        self.ymin = self.y_prop(float(points[4][1].text))
-        self.xmax = self.x_prop(float(points[4][2].text))
-        self.ymax = self.y_prop(float(points[4][3].text))
+        bbox = points.find('bndbox')
+        self.xmin = self.x_prop(float(bbox[0].text))
+        self.ymin = self.y_prop(float(bbox[1].text))
+        self.xmax = self.x_prop(float(bbox[2].text))
+        self.ymax = self.y_prop(float(bbox[3].text))
         self.cenx = (self.xmax+self.xmin)/2
         self.ceny = (self.ymax+self.ymin)/2
         
@@ -63,8 +64,11 @@ class Lable:
         self.prediction = torch.zeros([25,7,7], dtype=torch.float64)
         self.cats = cats
 
-        for el in root.iter('object'):
-            self.rectangles.append(Rectangle(el,(self.width,self.height)))
+        try:
+            for el in root.iter('object'):
+                self.rectangles.append(Rectangle(el,(self.width,self.height)))
+        except:
+            print(path)
 
     def target(self) -> torch.Tensor:
         cells = {}

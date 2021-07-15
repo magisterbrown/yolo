@@ -20,13 +20,12 @@ class VocSet(Dataset):
         return len(self.lables)
 
     def __getitem__(self, idx: int):
-        name = self.lables[int]
-        lable = Lable(f'{self.boxes_path}/{self.name}.xml',self.cats)
-        image = plt.imread(f'{self.img_path}/{self.name}.jpg')[...,::-1]/255
+        name = self.lables.at[idx,0]
+        lable = Lable(f'{self.boxes_path}/{name}.xml',self.cats)
+        image = plt.imread(f'{self.img_path}/{name}.jpg')[...,::-1]/255
         image =  cv2.resize(image, (448,448))
         mean = [0.485, 0.456, 0.406]
         std = [0.229, 0.224, 0.225]
         image = (image - mean)/std
 
         return image, lable.target()
-    

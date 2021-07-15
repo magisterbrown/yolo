@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 class TestLable(unittest.TestCase):
     
-    name = '006104'
+    name = '007526'
     def setUp(self):
         with open('VOC2007/categories.txt') as f:
             cats = {}
@@ -12,8 +12,6 @@ class TestLable(unittest.TestCase):
                 cats[val.strip().lower()] = key
         self.lable = Lable(f'VOC2007/Annotations/{self.name}.xml',cats)
 
-    def test_creation(self):
-        self.lable.add_rectangle(self.lable.rectangles[2])
     
     def fields(self):
         print(self.lable.rectangles[1].category)
