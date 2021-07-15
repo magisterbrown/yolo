@@ -1,6 +1,7 @@
 import unittest
 from loader import VocSet
 from torch.utils.data import DataLoader
+from loss import YoloLoss
 
 class TestLoader(unittest.TestCase):
 
@@ -12,4 +13,6 @@ class TestLoader(unittest.TestCase):
         print(ds[0][1].shape)
 
     def loader(self):
+        loss = YoloLoss(5,0.5)
         train_features, train_labels = next(iter(self.train_dataloader))
+        loss(train_labels,train_labels)
