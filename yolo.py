@@ -9,21 +9,28 @@ class Yolo(nn.Module):
         res = resnet34()
         weights = torch.load(resnet_weights)
         res.load_state_dict(weights)
-        self.resnet34 = nn.Sequential(*list(res.children())[:-2])
+        self.resnet34b1 = nn.Sequential(*list(res.children())[:-4])
+        self.resnet34b2 = nn.Sequential(*list(res.children())[-4:-2])
+        
+        self.pool = nn.AvgPool2d(2,2)
+        self.linear = nn.Sequential(
+                nn.LeakyReLU(negative_slope=0.1,inplace=True),
+                nn.Linear(25088,4096),
+                nn.LeakyReLU(negative_slope=0.1,inplace=True),
+                nn.Dropout(p=0.5,inplace=True),
+                nn.Linear(4096,1225)
+        )
+        self.sig = nn.Sigmoid()
 
-        self.l1 = nn.Linear(25088,4096)
-        self.rl = nn.ReLU()
-        self.l2 = nn.Linear(4096,1470)
-        self.pool = nn.MaxPool2d(2,2)
     def forward(self, x):
 
-        x = self.resnet34(x)
+        x = self.resnet34b1(x)
+        x = self.resnet34b2(x)
         x = self.pool(x)
         x = torch.flatten(x,1)
-        x = self.l1(x)
-        x = self.rl(x)
-        x = self.l2(x)
-        x = torch.reshape(x,(-1,30,7,7))
+        x = self.linear(x)
+        x = self.sig(x)*1.0001-0.00005
+        x = torch.reshape(x,(-1,25,7,7))
         
         return x
 

@@ -2,3 +2,4 @@ venv/
 __pycache__/
 checkpoints/
 VOC2007/
+tests/__pycache__/
