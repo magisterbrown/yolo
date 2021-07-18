@@ -17,7 +17,7 @@ class Yolo(nn.Module):
                 nn.LeakyReLU(negative_slope=0.1,inplace=True),
                 nn.Linear(25088,4096),
                 nn.LeakyReLU(negative_slope=0.1,inplace=True),
-                nn.Dropout(p=0.5,inplace=True),
+                nn.Dropout(p=0.5),
                 nn.Linear(4096,1225)
         )
         self.sig = nn.Sigmoid()

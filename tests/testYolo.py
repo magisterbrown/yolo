@@ -10,4 +10,4 @@ class Test(unittest.TestCase):
     def layers(self):
         randim = torch.rand(1,3,448,448)
         pred = self.yolo(randim)
-        print(self.yolo)
+        print(pred.shape)

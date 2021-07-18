@@ -6,15 +6,17 @@ class YoloLoss(nn.Module):
         super().__init__()
         self.coord = coord
         self.noobj = noobj
+        self.loss = nn.MSELoss()
 
     def forward(self,input: torch.Tensor,target: torch.Tensor) -> torch.Tensor:
+        #return self.loss(input,target)
         blocks = target.shape[-1]
         mask = torch.flatten(target[:,4,:,:]) > 0
         empty = torch.flatten(input[:,4,:,:])[~mask]
         target = self._reflat(target)[mask]
         input = self._reflat(input)[mask]
         for i in range(target.shape[0]):
-            target[i,4]=self._iou(input[i,:4],target[i,:4],blocks)
+            target[i,4]=self._iou(input[i,:4],target[i,:4],blocks).detach()
         
         
         target[:,2:4] = torch.sqrt(target[:,2:4])
