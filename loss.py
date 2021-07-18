@@ -9,14 +9,13 @@ class YoloLoss(nn.Module):
         self.loss = nn.MSELoss()
 
     def forward(self,input: torch.Tensor,target: torch.Tensor) -> torch.Tensor:
-        #return self.loss(input,target)
         blocks = target.shape[-1]
         mask = torch.flatten(target[:,4,:,:]) > 0
         empty = torch.flatten(input[:,4,:,:])[~mask]
         target = self._reflat(target)[mask]
         input = self._reflat(input)[mask]
         for i in range(target.shape[0]):
-            target[i,4]=self._iou(input[i,:4],target[i,:4],blocks).detach()
+            target[i,4]=self._iou(input[i,:4],target[i,:4],blocks)
         
         
         target[:,2:4] = torch.sqrt(target[:,2:4])
@@ -31,6 +30,8 @@ class YoloLoss(nn.Module):
 
     @staticmethod
     def _iou(b1: torch.Tensor,b2: torch.Tensor,blocks: int) -> torch.Tensor:
+        b1 = b1.detach()
+        b2 = b2.detach()
         cen1 = b1[:2]/blocks
         cen2 = b2[:2]/blocks
 
@@ -52,7 +53,7 @@ class YoloLoss(nn.Module):
 
         intersection = dx*dy
         union = b1[2]*b1[3]+b2[2]*b2[3]-intersection
-        return intersection/union
+        return float(intersection/union)
 
     @staticmethod
     def _sse(input: torch.Tensor,target: torch.Tensor) -> torch.Tensor:
