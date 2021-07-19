@@ -29,7 +29,7 @@ class Yolo(nn.Module):
         x = self.pool(x)
         x = torch.flatten(x,1)
         x = self.linear(x)
-        x = self.sig(x)*1.0001-0.00005
+        x = self.sig(x)
         x = torch.reshape(x,(-1,25,7,7))
         
         return x
