@@ -14,9 +14,9 @@ class Yolo(nn.Module):
         
         self.pool = nn.AvgPool2d(2,2)
         self.linear = nn.Sequential(
-                nn.LeakyReLU(negative_slope=0.1,inplace=True),
+                nn.LeakyReLU(negative_slope=0.1),
                 nn.Linear(25088,4096),
-                nn.LeakyReLU(negative_slope=0.1,inplace=True),
+                nn.LeakyReLU(negative_slope=0.1),
                 nn.Dropout(p=0.5),
                 nn.Linear(4096,1225)
         )
