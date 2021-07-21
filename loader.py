@@ -37,12 +37,12 @@ class VocSet(Dataset):
         scx = random.uniform(0.8,1.2)
         shy= random.uniform(-0.2,1.2-scy)
         shx= random.uniform(-0.2,1.2-scx)
-        self.lable.mov(shx,shy)
+        lable.mov(shx,shy)
         y = int(oh*(shy+0.2))
         x = int(ow*(shx+0.2))
 
         
-        self.lable.scale(scx,scy)
+        lable.scale(scx,scy)
         heigth = int(oh*scy)
         width = int(ow*scx)
         image = image[y:y+heigth, x:x+width]
