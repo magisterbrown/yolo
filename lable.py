@@ -121,7 +121,11 @@ class Lable:
             if(rectangle.ymax<=rectangle.ymin or rectangle.xmax<=rectangle.xmin):
                 rem.append(key)
 
-        for el in rem:
-            self.rectangles.pop(el)
+        rec = []
+        for key,el in enumerate(self.rectangles):
+            if(not (key in rem)):
+                rec.append(el)
+        self.rectangles = rec
+
 
             
