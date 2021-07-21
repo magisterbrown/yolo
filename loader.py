@@ -7,11 +7,12 @@ import cv2
 import random
 
 class VocSet(Dataset):
-    def __init__(self, annotations: str,img_path: str,boxes_path: str, categories: str):
+    def __init__(self, annotations: str,img_path: str,boxes_path: str, categories: str, aug: float):
         self.lables = pd.read_csv(annotations,header = None,dtype=str)
         self.img_path = img_path
         self.boxes_path = boxes_path
         self.cats = {}
+        self.aug = aug
 
         with open(categories) as f:
             for key,val in enumerate(f):
@@ -28,18 +29,20 @@ class VocSet(Dataset):
 
         #augmentations
         oh = image.shape[0]
-        borh = int(oh*0.2)
+        borh = int(oh*self.aug)
         ow = image.shape[1]
-        borw = int(ow*0.2)
+        borw = int(ow*self.aug)
         image=cv2.copyMakeBorder(image,borh,borh,borw,borw,cv2.BORDER_REPLICATE,value=[0,0,0])
+        mina = 1-self.aug
+        maxa = 1+self.aug
         
-        scy = random.uniform(0.8,1.2)
-        scx = random.uniform(0.8,1.2)
-        shy= random.uniform(-0.2,1.2-scy)
-        shx= random.uniform(-0.2,1.2-scx)
+        scy = random.uniform(mina,maxa)
+        scx = random.uniform(mina,maxa)
+        shy= random.uniform(-self.aug,maxa-scy)
+        shx= random.uniform(-self.aug,maxa-scx)
         lable.mov(shx,shy)
-        y = int(oh*(shy+0.2))
-        x = int(ow*(shx+0.2))
+        y = int(oh*(shy+self.aug))
+        x = int(ow*(shx+self.aug))
 
         
         lable.scale(scx,scy)
