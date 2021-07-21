@@ -15,8 +15,7 @@ class Rectangle:
         self.ymin = self.y_prop(float(bbox[1].text))
         self.xmax = self.x_prop(float(bbox[2].text))
         self.ymax = self.y_prop(float(bbox[3].text))
-        self.cenx = (self.xmax+self.xmin)/2
-        self.ceny = (self.ymax+self.ymin)/2
+        
         
         self.blocks = 1/7
         self.secarea = self.blocks*self.blocks
@@ -36,16 +35,19 @@ class Rectangle:
         return (top,bottom)
 
     def center(self) -> (int,int):
-        
-        cx = int(self.cenx/self.blocks)
-        cy = int(self.ceny/self.blocks)
+        cenx = (self.xmax+self.xmin)/2
+        ceny = (self.ymax+self.ymin)/2
+        cx = int(cenx/self.blocks)
+        cy = int(ceny/self.blocks)
 
         return (cx,cy)
 
     def margins(self) -> (float,float):
         cell = self.center()
-        margx = (self.cenx-cell[0]*self.blocks)/self.blocks
-        margy = (self.ceny-cell[1]*self.blocks)/self.blocks
+        cenx = (self.xmax+self.xmin)/2
+        ceny = (self.ymax+self.ymin)/2
+        margx = (cenx-cell[0]*self.blocks)/self.blocks
+        margy = (ceny-cell[1]*self.blocks)/self.blocks
 
         return (margx,margy)
     
@@ -96,3 +98,30 @@ class Lable:
             cv2.rectangle(image, edges[0], edges[1], (255,0,0), 2)
         return image
 
+    def mov(self,shiftx,shifty):
+        for rectangle in self.rectangles:
+            rectangle.xmin-=shiftx
+            rectangle.xmax-=shiftx
+            rectangle.ymin-=shifty
+            rectangle.ymax-=shifty
+
+    def scale(self,scalex,scaley):
+        rem = []
+        for key,rectangle in enumerate(self.rectangles):
+            rectangle.xmin/=scalex
+            rectangle.xmax/=scalex
+            rectangle.ymin/=scaley
+            rectangle.ymax/=scaley
+
+            if(rectangle.xmin<0):rectangle.xmin=0
+            if(rectangle.ymin<0):rectangle.ymin=0
+            if(rectangle.xmax>1):rectangle.xmax=1
+            if(rectangle.ymax>1):rectangle.ymax=1
+
+            if(rectangle.ymax<=rectangle.ymin or rectangle.xmax<=rectangle.xmin):
+                rem.append(key)
+
+        for el in rem:
+            self.rectangles.pop(el)
+
+            
