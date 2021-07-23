@@ -27,11 +27,12 @@ def draw(image: torch.Tensor,lable: torch.Tensor,pos: (int,int),cats: dict):
 
   return denorm
 
-def evaluate(dl,yolom,criterion):
+def evaluate(dl,yolom,criterion,device):
   results = []
   for i, data in enumerate(dl):
-    print(f'{i}/{len(dl)}')
     inputs, labels = data
+    inputs=inputs.cuda()
+    labels=labels.cuda()
     outputs = yolom(inputs)
     loss = criterion(outputs, labels)
     results.append(float(loss))
