@@ -1,6 +1,7 @@
 import torch
 import cv2
 import numpy as np
+from statistics import mean
 def draw(image: torch.Tensor,lable: torch.Tensor,pos: (int,int),cats: dict):
   box = lable[:,pos[0],pos[1]]
   parts = 1/lable.shape[-1]
@@ -25,3 +26,13 @@ def draw(image: torch.Tensor,lable: torch.Tensor,pos: (int,int),cats: dict):
   denorm=cv2.putText(denorm,f'{cats[cat]} {vl}%', (x1,y1-5),cv2.FONT_HERSHEY_TRIPLEX, 1, color)
 
   return denorm
+
+def evaluate(dl,yolom,criterion):
+  results = []
+  for i, data in enumerate(dl):
+    print(f'{i}/{len(dl)}')
+    inputs, labels = data
+    outputs = yolom(inputs)
+    loss = criterion(outputs, labels)
+    results.append(float(loss))
+  return mean(results)
