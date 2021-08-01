@@ -18,14 +18,18 @@ def draw(image: torch.Tensor,lable: torch.Tensor,pos: (int,int),cats: dict):
   y2 = int(centery+box[3]*side/2)
 
   color = np.random.rand(3,)
-  image = image.cpu().numpy().transpose(1,2,0)
-  mean = [0.485, 0.456, 0.406]
-  std = [0.229, 0.224, 0.225]
-  denorm = image*std+mean
   denorm = cv2.rectangle(denorm.copy() ,(x1,y1),(x2,y2),color,3)
   denorm=cv2.putText(denorm,f'{cats[cat]} {vl}%', (x1,y1-5),cv2.FONT_HERSHEY_TRIPLEX, 1, color)
 
   return denorm
+
+def denorm(image: torch.Tensor):
+
+  image = image.cpu().numpy().transpose(1,2,0)
+  mean = [0.485, 0.456, 0.406]
+  std = [0.229, 0.224, 0.225]
+  denorm = image*std+mean
+  return denorm.copy()
 
 def evaluate(dl,yolom,criterion,device):
   results = []
